@@ -63,3 +63,26 @@ def generate_knowledge_base_article(topic: str) -> str:
         max_tokens=4000
     )
     return response.choices[0].message.content
+
+
+def translate_response(text: str, target_lang: str) -> str:
+    """Translate support response to customer's language"""
+    response = openai_client.chat.completions.create(
+        model="gpt-4",
+        messages=[{"role": "user", "content": f"Translate to {target_lang}: {text}"}],
+        max_tokens=2000
+    )
+    return response.choices[0].message.content
+
+
+def analyze_conversation_sentiment(messages: list[str]) -> list[str]:
+    """Analyze sentiment of entire conversation"""
+    results = []
+    for msg in messages:
+        response = anthropic_client.messages.create(
+            model="claude-3-opus-20240229",
+            max_tokens=100,
+            messages=[{"role": "user", "content": f"Sentiment of: {msg}"}]
+        )
+        results.append(response.content[0].text)
+    return results
