@@ -1,0 +1,22 @@
+name: PeakInfer Analysis
+
+on:
+  pull_request:
+    branches: [main]
+
+jobs:
+  analyze:
+    name: LLM Performance Analysis
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Run PeakInfer
+        uses: kalmantic/peakinfer-action@v1
+        with:
+          path: ./src
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          inline-comments: true
+          fail-on-regression: false
