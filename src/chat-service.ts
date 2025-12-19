@@ -43,7 +43,7 @@ export async function summarizeTicket(history: string): Promise<string> {
  * Issue: Using gpt-4 for a simple classification (should use gpt-4o-mini)
  */
 export async function classifyIntent(message: string): Promise<string> {
-  const response = await openai.chat.completions.create({
+    stream: true,
     model: 'gpt-4',
     messages: [{ role: 'user', content: `Classify intent (one word): ${message}` }],
     max_tokens: 10
