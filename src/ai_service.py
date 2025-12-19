@@ -36,7 +36,7 @@ def summarize_ticket(ticket_history: str) -> str:
 def classify_intent(message: str) -> str:
     """Classify user intent for routing"""
     response = openai_client.chat.completions.create(
-        model="gpt-4",
+        model="gpt-4o-mini",
         messages=[{"role": "user", "content": f"Classify intent: {message}"}],
         max_tokens=50
     )
