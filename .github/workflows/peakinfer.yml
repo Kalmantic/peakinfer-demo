@@ -3,9 +3,11 @@ name: PeakInfer Analysis
 on:
   pull_request:
     branches: [main]
+  issue_comment:
+    types: [created]
 
 permissions:
-  contents: read
+  contents: write
   pull-requests: write
   issues: write
 
@@ -13,6 +15,13 @@ jobs:
   analyze:
     name: LLM Performance Analysis
     runs-on: ubuntu-latest
+    if: >
+      github.event_name == 'pull_request' ||
+      (github.event_name == 'issue_comment' &&
+       github.event.issue.pull_request &&
+       (contains(github.event.comment.body, '/peakinfer') ||
+        contains(github.event.comment.body, '/fix') ||
+        contains(github.event.comment.body, '/dismiss')))
 
     steps:
       - name: Checkout code
