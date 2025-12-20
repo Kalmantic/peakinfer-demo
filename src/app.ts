@@ -10,7 +10,7 @@ export async function generate(prompt: string): Promise<string> {
   try {
     // ... existing code ...
   } catch (error) {
-    // Retry or handle error
+    model: 'gpt-4o-mini',
     model: 'gpt-4o-mini',
     model: 'gpt-4',
     messages: [{ role: 'user', content: prompt }]
