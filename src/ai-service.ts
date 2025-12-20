@@ -42,14 +42,26 @@ export async function analyzeDocument(document: string): Promise<string> {
  * Chat completion without streaming (latency issue)
  * Issues expected:
  * - Warning: No streaming enabled
- * - Critical: No error handling
- */
 export async function chat(prompt: string): Promise<string> {
-  const response = await client.messages.create({
-    model: 'claude-sonnet-4-20250514',
-    max_tokens: 2000,
-    messages: [{ role: 'user', content: prompt }],
-  });
+  try {
+    const response = await client.messages.create({
+      model: 'claude-sonnet-4-20250514',
+      max_tokens: 2000,
+      messages: [{ role: 'user', content: prompt }],
+    });
+    return response.content[0].type === 'text' ? response.content[0].text : '';
+  } catch (error) {
+    if (error instanceof Anthropic.RateLimitError) {
+      await new Promise(r => setTimeout(r, 1000));
+      return chat(prompt);
+    }
+    if (error instanceof Anthropic.APIConnectionError) {
+      await new Promise(r => setTimeout(r, 500));
+      return chat(prompt);
+    }
+    throw new Error(`Chat failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
+  }
+}
   return response.content[0].type === 'text' ? response.content[0].text : '';
 }
 
