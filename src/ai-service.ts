@@ -54,14 +54,28 @@ export async function chat(prompt: string): Promise<string> {
 
 // ============================================================================
 // MEDIUM PATTERNS (some issues)
-// ============================================================================
-
-/**
- * Translation service (no timeout configured)
- * Issues expected:
- * - Warning: No timeout configured
- */
 export async function translate(text: string, targetLang: string): Promise<string> {
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 15000);
+  
+  try {
+    const response = await client.messages.create({
+      model: 'claude-3-5-sonnet-20241022',
+      max_tokens: 2000,
+      messages: [{ role: 'user', content: `Translate to ${targetLang}: ${text}` }],
+    }, {
+      signal: controller.signal
+    });
+    clearTimeout(timeoutId);
+    return response.content[0].type === 'text' ? response.content[0].text : '';
+  } catch (error) {
+    clearTimeout(timeoutId);
+    if (error.name === 'AbortError') {
+      throw new Error('Translation request timed out after 15 seconds');
+    }
+    throw error;
+  }
+}
   const response = await client.messages.create({
     model: 'claude-3-5-sonnet-20241022',
     max_tokens: 2000,
