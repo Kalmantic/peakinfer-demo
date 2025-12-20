@@ -18,14 +18,26 @@ const client = new Anthropic();
  * - Warning: Expensive model for simple task
  */
 export async function analyzeDocument(document: string): Promise<string> {
-  const response = await client.messages.create({
-    model: 'claude-opus-4-20250514',
-    max_tokens: 4000,
-    messages: [{ role: 'user', content: `Analyze: ${document}` }],
-  });
-  return response.content[0].type === 'text' ? response.content[0].text : '';
+export async function analyzeDocument(document: string): Promise<string> {
+  try {
+    const response = await client.messages.create({
+      model: 'claude-opus-4-20250514',
+      max_tokens: 4000,
+      messages: [{ role: 'user', content: `Analyze: ${document}` }],
+    });
+    return response.content[0].type === 'text' ? response.content[0].text : '';
+  } catch (error) {
+    if (error instanceof Anthropic.RateLimitError) {
+      await new Promise(r => setTimeout(r, 2000));
+      return analyzeDocument(document);
+    }
+    if (error instanceof Anthropic.APIConnectionError) {
+      await new Promise(r => setTimeout(r, 1000));
+      return analyzeDocument(document);
+    }
+    throw new Error(`Document analysis failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
+  }
 }
-
 /**
  * Chat completion without streaming (latency issue)
  * Issues expected:
