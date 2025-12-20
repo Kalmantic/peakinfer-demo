@@ -3,7 +3,11 @@ import OpenAI from 'openai';
 const openai = new OpenAI();
 
 export async function generate(prompt: string): Promise<string> {
-  const response = await openai.chat.completions.create({
+  try {
+    // ... existing code ...
+  } catch (error) {
+    // Retry or handle error
+  }
     model: 'gpt-4',
     messages: [{ role: 'user', content: prompt }]
   });
