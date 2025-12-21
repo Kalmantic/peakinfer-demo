@@ -49,12 +49,24 @@ export async function chat(prompt: string): Promise<string> {
       model: 'claude-sonnet-4-20250514',
       max_tokens: 2000,
       messages: [{ role: 'user', content: prompt }],
+export async function* chatStream(prompt: string): AsyncGenerator<string> {
+  try {
+    const stream = await client.messages.stream({
+      model: 'claude-sonnet-4-20250514',
+      max_tokens: 2000,
+      messages: [{ role: 'user', content: prompt }],
     });
-    return response.content[0].type === 'text' ? response.content[0].text : '';
+
+    for await (const event of stream) {
+      if (event.type === 'content_block_delta' && event.delta.type === 'text_delta') {
+        yield event.delta.text;
+      }
+    }
   } catch (error) {
     if (error instanceof Anthropic.RateLimitError) {
       await new Promise(r => setTimeout(r, 1000));
-      return chat(prompt);
+      yield* chatStream(prompt);
+      return;
     }
     if (error instanceof Anthropic.APIConnectionError) {
       throw new Error('Unable to connect to AI service. Please check your internet connection.');
@@ -62,12 +74,14 @@ export async function chat(prompt: string): Promise<string> {
     throw error;
   }
 }
-  });
-  return response.content[0].type === 'text' ? response.content[0].text : '';
-}
 
-// ============================================================================
-// MEDIUM PATTERNS (some issues)
+export async function chat(prompt: string): Promise<string> {
+  let result = '';
+  for await (const chunk of chatStream(prompt)) {
+    result += chunk;
+  }
+  return result;
+}
 export async function translate(text: string, targetLang: string): Promise<string> {
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), 15000);
