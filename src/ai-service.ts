@@ -20,14 +20,28 @@ const client = new Anthropic();
 export async function analyzeDocument(document: string): Promise<string> {
   const response = await client.messages.create({
     model: 'claude-opus-4-20250514',
-    max_tokens: 4000,
-    messages: [{ role: 'user', content: `Analyze: ${document}` }],
-  });
-  return response.content[0].type === 'text' ? response.content[0].text : '';
+export async function analyzeDocument(document: string): Promise<string> {
+  try {
+    const response = await client.messages.create({
+      model: 'claude-opus-4-20250514',
+      max_tokens: 4000,
+      messages: [{ role: 'user', content: `Analyze: ${document}` }],
+    });
+    return response.content[0].type === 'text' ? response.content[0].text : '';
+  } catch (error) {
+    if (error instanceof Anthropic.RateLimitError) {
+      await new Promise(r => setTimeout(r, 2000));
+      return analyzeDocument(document);
+    }
+    if (error instanceof Anthropic.APIConnectionError) {
+      throw new Error('Unable to connect to AI service. Please check your internet connection.');
+    }
+    if (error instanceof Anthropic.APIError && error.status === 529) {
+      throw new Error('AI service is overloaded. Please try again in a few minutes.');
+    }
+    throw error;
+  }
 }
-
-/**
- * Chat completion without streaming (latency issue)
  * Issues expected:
 export async function chat(prompt: string): Promise<string> {
   try {
