@@ -17,4 +17,5 @@ jobs:
       - uses: kalmantic/peakinfer-action@v1
         with:
           token: ${{ secrets.PEAKINFER_TOKEN }}
+          github-token: ${{ github.token }}
           path: ./src
