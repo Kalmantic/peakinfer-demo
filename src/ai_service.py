@@ -63,3 +63,4 @@ def generate_knowledge_base_article(topic: str) -> str:
         max_tokens=4000
     )
     return response.choices[0].message.content
+
