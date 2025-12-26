@@ -1,27 +1,22 @@
-name: PeakInfer Analysis
+name: PeakInfer
 
 on:
   pull_request:
     branches: [main]
+  workflow_dispatch:
 
 permissions:
   contents: read
   pull-requests: write
-  issues: write
 
 jobs:
   analyze:
-    name: LLM Performance Analysis
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Run PeakInfer
-        uses: kalmantic/peakinfer@mtrajanv2-branch
+      - uses: kalmantic/peakinfer-action@v1
         with:
+          token: ${{ secrets.PEAKINFER_TOKEN }}
+          github-token: ${{ github.token }}
           path: ./src
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          inline-comments: true
-          fail-on-regression: false
