@@ -34,7 +34,7 @@ def summarize_ticket(ticket_history: str) -> str:
 
 
 def classify_intent(message: str) -> str:
-    """Classify user intent for routing"""
+    """Classify user intent for routing - uses GPT-4 for simple classification"""
     response = openai_client.chat.completions.create(
         model="gpt-4",
         messages=[{"role": "user", "content": f"Classify intent: {message}"}],
