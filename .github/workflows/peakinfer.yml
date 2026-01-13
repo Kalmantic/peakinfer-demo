@@ -20,3 +20,6 @@ jobs:
           peakinfer-token: ${{ secrets.PEAKINFER_TOKEN }}
           github-token: ${{ github.token }}
           path: ./src
+        env:
+          PEAKINFER_TOKEN: ${{ secrets.PEAKINFER_TOKEN }}
+          GITHUB_TOKEN: ${{ github.token }}
