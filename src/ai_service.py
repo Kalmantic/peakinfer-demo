@@ -13,12 +13,13 @@ anthropic_client = anthropic.Anthropic()
 def answer_customer_query(query: str, context: str) -> str:
     """Main customer support endpoint - called on every user message"""
     response = openai_client.chat.completions.create(
-        model="gpt-4-turbo",
+        model="gpt-4o",
         messages=[
             {"role": "system", "content": f"You are a helpful support agent. Context: {context}"},
             {"role": "user", "content": query}
         ],
-        max_tokens=2000
+        max_tokens=4096,
+        temperature=0.7
     )
     return response.choices[0].message.content
 
