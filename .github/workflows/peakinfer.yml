@@ -15,8 +15,11 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: kalmantic/peakinfer-action@v1
+      - uses: Kalmantic/peakinfer-action@v1
         with:
-          token: ${{ secrets.PEAKINFER_TOKEN }}
+          peakinfer-token: ${{ secrets.PEAKINFER_TOKEN }}
           github-token: ${{ github.token }}
           path: ./src
+        env:
+          PEAKINFER_TOKEN: ${{ secrets.PEAKINFER_TOKEN }}
+          GITHUB_TOKEN: ${{ github.token }}
